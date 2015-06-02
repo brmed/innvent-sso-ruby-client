@@ -11,7 +11,13 @@ module Sso
         session_handler = SsoClient::SessionHandler.new(session)
         session_handler.validate_is_authorized_to_callback!(params['data'])
         user = session_handler.store_user_on_session(params)
-        after_logged_in(user)
+
+        if user and (user.applications.include? sso_configuration.allowed_application)
+          after_logged_in(user)
+        else
+          sso_logout
+        end
+
       rescue SsoClient::InvalidTokenError => e
         render text: e.message
       end

@@ -17,5 +17,9 @@ module SsoClient
     def api_password
       @config_file["api_password"]
     end
+
+    def allowed_application
+      @config_file["allowed_application"] || "default"
+    end
   end
 end
