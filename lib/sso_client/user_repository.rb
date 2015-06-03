@@ -38,6 +38,13 @@ module SsoClient
       users.map { |u| SsoUser.new(u) }      
     end
 
+    def users_by_application(application)
+      response = HTTParty.get(@all_users_url, basic_auth: build_auth_hash)
+      users = JSON.parse(response.body)
+      by_app = users.select { |u| (u["applications"].include? application.to_s) }
+      by_app.map { |u| SsoClient::SsoUser.new(u) }
+    end
+
     private
     def build_auth_hash
       {
