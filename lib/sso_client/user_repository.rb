@@ -8,6 +8,8 @@ module SsoClient
       @create_user_url = @sso_configuration.sso_server_address + "/users"
       @all_users_url = @sso_configuration.sso_server_address + "/users"
       @update_user_url = @sso_configuration.sso_server_address + "/users/:user_id"
+      @add_user_app_url = @sso_configuration.sso_server_address + "/users/:login/applications/"
+      @remove_user_app_url = @sso_configuration.sso_server_address + "/users/:login/applications/:application/"
     end
 
     def create_or_update_user(firstname, lastname, username, email, password)
@@ -35,7 +37,7 @@ module SsoClient
     def all_users
       response = HTTParty.get(@all_users_url, basic_auth: build_auth_hash)
       users = JSON.parse(response.body)
-      users.map { |u| SsoUser.new(u) }      
+      users.map { |u| SsoUser.new(u) }
     end
 
     def users_by_application(application)
@@ -43,6 +45,15 @@ module SsoClient
       users = JSON.parse(response.body)
       by_app = users.select { |u| (u["applications"].include? application.to_s) }
       by_app.map { |u| SsoClient::SsoUser.new(u) }
+    end
+
+    def add_user_application(login, slug)
+      body = {:application => slug}
+      response = HTTParty.post(add_app_url_for(login), body: body, basic_auth: build_auth_hash)
+    end
+
+    def remove_user_application(login, slug)
+      response = HTTParty.delete(remove_app_url_for(login, slug), basic_auth: build_auth_hash)
     end
 
     private
@@ -65,6 +76,14 @@ module SsoClient
 
     def update_url_for(id)
       @update_user_url.gsub(/:user_id/, id.to_s)
+    end
+
+    def add_app_url_for(login)
+      @add_user_app_url.gsub(/:login/, login.to_s)
+    end
+
+    def remove_app_url_for(login, slug)
+      @remove_user_app_url.gsub(/:login/, login.to_s).gsub(/:application/, slug.to_s)
     end
   end
 end
