@@ -12,7 +12,7 @@ module Sso
         session_handler.validate_is_authorized_to_callback!(params['data'])
         user = session_handler.store_user_on_session(params)
 
-        if user and (user.applications.include? sso_configuration.allowed_application)
+        if user and (user.applications.include? sso_configuration.allowed_application or sso_configuration.allowed_application == 'no_validate')
           after_logged_in(user)
         else
           sso_logout
