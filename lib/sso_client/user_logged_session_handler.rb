@@ -1,4 +1,5 @@
 require "base64" 
+require "json"
 module SsoClient
   class UserLoggedSessionHandler
     SSO_KEY = :sso_token
@@ -14,16 +15,17 @@ module SsoClient
 
     def is_logged_and_valid?
       return false if token_is_empty? 
-      self.user_token_is_correct?
+      user_token_is_correct?
     end
 
     private
 
     def user_token_is_correct?
       encripted_user_data = @request.GET['data']
-      return false if encripted_user_data.empty?
+      return false if not encripted_user_data.present?
       user_data = Base64.decode64(encripted_user_data)
-      return @token == user_data['user']['token']
+      user_data = JSON.load(user_data)
+      return @token == user_data['token']
     end
 
     def token_is_empty?
