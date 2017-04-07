@@ -9,8 +9,11 @@ module SsoClient
     def initialize(session, request)
       @session = session
       @request = request
-      @token = @session[SSO_KEY][TOKEN_VALUE_KEY]
-      @expires_at = @session[SSO_KEY][TOKEN_EXPIRATION_DATE]
+      @empty_session = @session.nil?
+      if not @empty_session and @session.include?(SSO_KEY)
+        @token = @session[SSO_KEY][TOKEN_VALUE_KEY]
+        @expires_at = @session[SSO_KEY][TOKEN_EXPIRATION_DATE]
+      end
     end
 
     def is_logged_and_valid?
