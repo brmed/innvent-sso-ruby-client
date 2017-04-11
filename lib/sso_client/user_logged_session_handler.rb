@@ -21,14 +21,29 @@ module SsoClient
       user_token_is_correct?
     end
 
-    private
+    def user_logged_info
+      user_data = decode_user_data
+      if user_data 
+        return SsoUser.new(user_data['user'])
+      end
+      return false
+    end
 
+    private
     def user_token_is_correct?
+      user_data = decode_user_data
+      if user_data
+        return @token == user_data['token']
+      end
+      return false
+    end
+
+    def decode_user_data
       encripted_user_data = @request.GET['data']
       return false if not encripted_user_data.present?
       user_data = Base64.decode64(encripted_user_data)
       user_data = JSON.load(user_data)
-      return @token == user_data['token']
+      user_data
     end
 
     def token_is_empty?

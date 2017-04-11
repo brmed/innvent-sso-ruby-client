@@ -32,6 +32,11 @@ module SsoClient
       end
     end
 
+    def user_logged_info
+      user_logged_handler = UserLoggedSessionHandler.new(session,request)
+      user_logged_handler.user_logged_info
+    end
+
     def sso_logout
       redirect_to sso_logout_path
     end
