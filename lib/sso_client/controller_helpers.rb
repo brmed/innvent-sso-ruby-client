@@ -19,6 +19,24 @@ module SsoClient
       end
     end
 
+    def check_user_is_authenticated!
+      begin
+        user_logged_handler = UserLoggedSessionHandler.new(session,request)
+
+        if !user_logged_handler.is_logged_and_valid? || !sso_authentication_still_valid?
+          generate_token
+          redirect_to sso_authorize_path_with_callback_url(request.url)
+        end
+      rescue Errno::ECONNREFUSED => e
+        render :text => "SSO server is not running or is not accessible!!"
+      end
+    end
+
+    def user_logged_info
+      user_logged_handler = UserLoggedSessionHandler.new(session,request)
+      user_logged_handler.user_logged_info
+    end
+
     def sso_logout
       redirect_to sso_logout_path
     end
@@ -37,6 +55,10 @@ module SsoClient
 
     def sso_authorize_path
       "#{sso_configuration.sso_server_address}/authorize#{build_request_params_string}"
+    end
+
+    def sso_authorize_path_with_callback_url(callback_url)
+      "#{sso_configuration.sso_server_address}/authorize#{build_request_params_string(callback_url)}"
     end
 
     def sso_validate_token_path
