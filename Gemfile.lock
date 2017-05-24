@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    sso_client (1.2.1)
+    sso_client (1.2.2)
       httparty
       rails (>= 3.1)
 
@@ -110,6 +110,3 @@ DEPENDENCIES
   bundler (~> 1.6)
   rake
   sso_client!
-
-BUNDLED WITH
-   1.14.6
